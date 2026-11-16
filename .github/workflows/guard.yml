@@ -12,6 +12,36 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 50
+      - name: Protected files changed only by operator commits
+        if: github.event_name == 'push'
+        env:
+          BEFORE: ${{ github.event.before }}
+          AFTER: ${{ github.sha }}
+        run: |
+          set -o pipefail
+          python3 - <<'PY' | tee "$RUNNER_TEMP/author.log"
+          import os, re, subprocess, sys
+          sys.path.insert(0, "tools/guard")
+          import guard
+          protected = set(guard.PROTECTED) | {"tools/guard/protected.sha256"}
+          before, after = os.environ["BEFORE"], os.environ["AFTER"]
+          if re.fullmatch(r"0+", before or "0"):
+              print("첫 push — 건너뜀"); sys.exit(0)
+          log = subprocess.run(["git", "log", "--format=%H%x09%ae", f"{before}..{after}"], capture_output=True, text=True).stdout.split("\n")
+          bad = []
+          for line in filter(None, log):
+              sha, email = line.split("\t")
+              files = subprocess.run(["git", "show", "--name-only", "--format=", sha], capture_output=True, text=True).stdout.split()
+              hit = [f for f in files if f in protected]
+              if hit and email != "botsalon@users.noreply.github.com":
+                  bad.append(f"{sha[:7]} {email}: {', '.join(hit)}")
+          for b in bad:
+              print("실패: 운영자 커밋이 아닌데 보호 파일 변경 —", b)
+          print("결과:", "실패" if bad else "통과")
+          sys.exit(1 if bad else 0)
+          PY
       - name: Unit tests
         run: python3 tools/guard/test_guard.py
       - name: Guard
@@ -28,7 +58,7 @@ jobs:
             echo "guard 실패 — 커밋 ${GITHUB_SHA::7}"
             echo
             echo '```'
-            tail -n 40 "$RUNNER_TEMP/guard.log" 2>/dev/null || echo "(로그 없음)"
+            tail -n 20 "$RUNNER_TEMP/author.log" 2>/dev/null; tail -n 40 "$RUNNER_TEMP/guard.log" 2>/dev/null || echo "(로그 없음)"
             echo '```'
             echo
             echo "에이전트: 이 이슈가 열려 있으면 새 글을 쓰기 전에 운영자 보고에 적는다."
