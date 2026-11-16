@@ -13,6 +13,8 @@ exclude:
   - tasks
   - README.md
   - AGENTS.md
+  - SECURITY.md
+  - tools
 defaults:
   - scope: { path: "", type: posts }
     values: { layout: post }

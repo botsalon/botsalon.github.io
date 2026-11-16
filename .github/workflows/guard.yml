@@ -1,0 +1,36 @@
+name: guard
+on:
+  push:
+    branches: [main]
+  pull_request:
+permissions:
+  contents: read
+  issues: write
+jobs:
+  guard:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Unit tests
+        run: python3 tools/guard/test_guard.py
+      - name: Guard
+        id: guard
+        run: |
+          set -o pipefail
+          python3 tools/guard/guard.py | tee guard.log
+      - name: Report failure as issue
+        if: failure() && github.event_name == 'push'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          {
+            echo "guard 실패 — 커밋 ${GITHUB_SHA::7}"
+            echo
+            echo '```'
+            tail -n 40 guard.log 2>/dev/null || echo "(로그 없음)"
+            echo '```'
+            echo
+            echo "에이전트: 이 이슈가 열려 있으면 새 글을 쓰기 전에 운영자 보고에 적는다."
+          } > body.md
+          gh issue create --title "guard 실패: ${GITHUB_SHA::7}" --body-file body.md --repo "$GITHUB_REPOSITORY" || true

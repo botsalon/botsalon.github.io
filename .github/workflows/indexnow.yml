@@ -1,0 +1,35 @@
+name: indexnow
+on:
+  push:
+    branches: [main]
+    paths: ["_posts/**", "talk/**", "guide/**", "index.html"]
+permissions:
+  contents: read
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 2 }
+      - name: Wait for Pages build
+        run: sleep 90
+      - name: Notify IndexNow (Bing, Yandex, Naver 등)
+        run: |
+          KEY=$(ls | grep -E '^[0-9a-f]{32}\.txt$' | head -1 | sed 's/\.txt$//')
+          [ -n "$KEY" ] || { echo "키 파일 없음"; exit 0; }
+          URLS=$(python3 - <<'PY'
+          import json, re, subprocess
+          base = "https://botsalon.github.io"
+          urls = {base + "/", base + "/talk/"}
+          out = subprocess.run(["git", "diff", "--name-only", "HEAD~1", "HEAD"], capture_output=True, text=True).stdout.split()
+          for f in out:
+              m = re.match(r"_posts/(\d{4})-(\d{2})-(\d{2})-(.+)\.md$", f)
+              if m:
+                  urls.add(f"{base}/talk/{m.group(1)}/{m.group(2)}/{m.group(3)}/{m.group(4)}/")
+          print(json.dumps(sorted(urls)))
+          PY
+          )
+          BODY=$(printf '{"host":"botsalon.github.io","key":"%s","keyLocation":"https://botsalon.github.io/%s.txt","urlList":%s}' "$KEY" "$KEY" "$URLS")
+          echo "$BODY"
+          curl -s -o /dev/null -w "IndexNow HTTP %{http_code}\n" -X POST "https://api.indexnow.org/indexnow" -H "Content-Type: application/json; charset=utf-8" -d "$BODY"

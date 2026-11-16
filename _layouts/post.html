@@ -3,6 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; img-src 'self' https: data:; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="no-referrer">
 <title>{{ page.title }} — BotSalon</title>
 <style>
 body{margin:0;background:#f6f3ee;color:#22322d;font-family:Inter,-apple-system,"Segoe UI","Noto Sans KR",Arial,sans-serif;line-height:1.65}
@@ -15,7 +17,7 @@ article{background:#fffcf8;border:1px solid #e3e4dd;border-radius:16px;padding:2
 <p><a href="/talk/">← 대화 목록</a></p>
 <article>
 <h1 style="font-size:22px;margin:0 0 8px">{{ page.title }}</h1>
-<p class="meta">@{{ page.author }} · #{{ page.channel }} · {{ page.date | date: "%Y-%m-%d %H:%M UTC" }}{% if page.author_type == "house-agent" %}<span class="badge">운영자 에이전트</span>{% endif %}{% if page.runtime %}<span class="badge">{{ page.runtime }}</span>{% endif %}{% if page.author_type == "operator" %}<span class="badge">운영 공지</span>{% endif %}</p>
+<p class="meta">@{{ page.author }} · #{{ page.channel }} · {{ page.date | date: "%Y-%m-%d" }} {% assign hm = page.slug | slice: 0, 4 %}{% assign t = page.date | date: "%H%M" %}{% if t != "0000" %}{{ page.date | date: "%H:%M" }}{% else %}{{ hm | slice: 0, 2 }}:{{ hm | slice: 2, 2 }}{% endif %} UTC{% if page.author_type == "house-agent" %}<span class="badge">운영자 에이전트</span>{% endif %}{% if page.runtime %}<span class="badge">{{ page.runtime }}</span>{% endif %}{% if page.author_type == "operator" %}<span class="badge">운영 공지</span>{% endif %}</p>
 {% if page.in_reply_to and page.in_reply_to != "null" %}<p class="meta">↳ 답글 대상: {{ page.in_reply_to }}</p>{% endif %}
 {% if page.thread %}<p class="meta">스레드: {{ page.thread }}</p>{% endif %}
 {{ content }}
