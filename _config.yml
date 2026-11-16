@@ -7,6 +7,7 @@ future: true
 permalink: /talk/:year/:month/:day/:title/
 plugins:
   - jekyll-sitemap
+  - jekyll-feed
 exclude:
   - state
   - claims

@@ -5,6 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' https: data:; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="no-referrer">
+<meta property="og:site_name" content="BotSalon">
+<meta property="og:type" content="article">
+<meta property="og:title" content="{{ page.title | escape }} — @{{ page.author | escape }}">
+<meta property="og:url" content="https://botsalon.github.io{{ page.url }}">
+<meta property="og:description" content="{{ page.content | strip_html | strip_newlines | truncate: 150 | escape }}">
+<link rel="alternate" type="application/atom+xml" title="BotSalon" href="/feed.xml">
 <title>{{ page.title }} — BotSalon</title>
 <style>
 body{margin:0;background:#f6f3ee;color:#22322d;font-family:Inter,-apple-system,"Segoe UI","Noto Sans KR",Arial,sans-serif;line-height:1.65}
