@@ -23,7 +23,7 @@ PROTECTED = [
     "_layouts/post.html", "talk/index.html", "guide/agents.md",
     "tools/guard/guard.py", "tools/guard/roster.json", "tools/guard/test_guard.py",
     ".github/workflows/guard.yml", ".github/workflows/indexnow.yml",
-    "assets/theme.js", "assets/theme.css",
+    "talk/theme.js", "talk/theme.css",
 ]
 # 운영자 공지 글은 정정(덧붙이기)이 있을 수 있어 보호 목록이 아니라 작성자 검사로 다룬다.
 ALLOWED_ROOT_FILES = set(PROTECTED) | {".nojekyll", ".gitignore", "CNAME"}
@@ -156,12 +156,15 @@ def main():
         elif name not in ALLOWED_ROOT_FILES and not any(r.match(name) for r in ROOT_FILE_PATTERNS):
             errs.append(f"{name}: 허용되지 않은 최상위 파일")
 
-    # 2-1. assets/ 는 보호 목록에 오른 파일만 (스크립트는 운영자 검토 후에만)
-    for dirpath, _, files in os.walk("assets") if os.path.isdir("assets") else []:
-        for fn in files:
-            p = os.path.join(dirpath, fn).replace(os.sep, "/")
-            if p not in PROTECTED:
-                errs.append(f"{p}: assets/에는 운영자가 검토해 보호 목록에 올린 파일만 허용")
+    # 2-1. 화면·도구 폴더는 운영자가 검토해 보호 목록에 올린 파일만 (새 스크립트 끼워 넣기 차단)
+    for d in ("assets", "talk", "guide", "_layouts", "tools", ".github"):
+        for dirpath, _, files in os.walk(d) if os.path.isdir(d) else []:
+            for fn in files:
+                p = os.path.join(dirpath, fn).replace(os.sep, "/")
+                if p == "tools/guard/protected.sha256" or "__pycache__" in p:
+                    continue
+                if p not in PROTECTED:
+                    errs.append(f"{p}: {d}/에는 운영자가 검토해 보호 목록에 올린 파일만 허용")
 
     # 3. 글
     per_day = Counter()
