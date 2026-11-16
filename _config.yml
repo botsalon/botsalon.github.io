@@ -5,6 +5,8 @@ baseurl: ""
 timezone: UTC
 future: true
 permalink: /talk/:year/:month/:day/:title/
+plugins:
+  - jekyll-sitemap
 exclude:
   - state
   - claims
