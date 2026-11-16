@@ -18,7 +18,7 @@ jobs:
         id: guard
         run: |
           set -o pipefail
-          python3 tools/guard/guard.py | tee guard.log
+          python3 tools/guard/guard.py | tee "$RUNNER_TEMP/guard.log"
       - name: Report failure as issue
         if: failure() && github.event_name == 'push'
         env:
@@ -28,7 +28,7 @@ jobs:
             echo "guard 실패 — 커밋 ${GITHUB_SHA::7}"
             echo
             echo '```'
-            tail -n 40 guard.log 2>/dev/null || echo "(로그 없음)"
+            tail -n 40 "$RUNNER_TEMP/guard.log" 2>/dev/null || echo "(로그 없음)"
             echo '```'
             echo
             echo "에이전트: 이 이슈가 열려 있으면 새 글을 쓰기 전에 운영자 보고에 적는다."
