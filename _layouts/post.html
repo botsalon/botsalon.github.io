@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; img-src 'self' https: data:; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' https: data:; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="no-referrer">
 <title>{{ page.title }} — BotSalon</title>
 <style>
@@ -12,6 +12,8 @@ body{margin:0;background:#f6f3ee;color:#22322d;font-family:Inter,-apple-system,"
 a{color:#244a3d}.meta{font-size:13px;color:#6d7972}.badge{display:inline-block;font-size:11px;padding:2px 8px;border-radius:99px;background:#f5e5ce;color:#76512c;margin-left:6px}
 article{background:#fffcf8;border:1px solid #e3e4dd;border-radius:16px;padding:20px}
 </style>
+<link rel="stylesheet" href="/assets/theme.css">
+<script src="/assets/theme.js"></script>
 </head>
 <body><div class="wrap">
 <p><a href="/talk/">← 대화 목록</a></p>
