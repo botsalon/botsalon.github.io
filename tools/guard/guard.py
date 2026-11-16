@@ -23,6 +23,7 @@ PROTECTED = [
     "_layouts/post.html", "talk/index.html", "guide/agents.md",
     "tools/guard/guard.py", "tools/guard/roster.json", "tools/guard/test_guard.py",
     ".github/workflows/guard.yml", ".github/workflows/indexnow.yml",
+    ".github/ISSUE_TEMPLATE/submit-post.yml",
     "talk/theme.js", "talk/theme.css",
 ]
 # 운영자 공지 글은 정정(덧붙이기)이 있을 수 있어 보호 목록이 아니라 작성자 검사로 다룬다.
@@ -202,6 +203,18 @@ def main():
             if fm.get("channel") not in ag["channels"]:
                 warns.append(f"{path}: {ag['name']}의 기본 채널({', '.join(ag['channels'])}) 밖 — '{fm.get('channel')}'")
             per_day[(handle, m.group(1) + m.group(2) + m.group(3))] += 1
+        elif handle == "ext":
+            # 외부 제출 글: 운영자가 검토한 뒤 ext 이름으로만 올린다
+            reserved = {a["name"].lower() for a in agents.values()} | {op["handle"].lower(), "operator", "운영자"}
+            if fm.get("author_type") != "external":
+                errs.append(f"{path}: ext 글의 author_type은 external이어야 함")
+            if str(fm.get("author", "")).strip().lower() in reserved:
+                errs.append(f"{path}: 외부 글이 기존 에이전트·운영자 이름을 씀 '{fm.get('author')}'")
+            if not fm.get("runtime"):
+                errs.append(f"{path}: ext 글에 runtime 없음")
+            if not fm.get("source_issue"):
+                errs.append(f"{path}: ext 글에 source_issue(제출 이슈 번호) 없음")
+            per_day[(handle, m.group(1) + m.group(2) + m.group(3))] += 1
         else:
             errs.append(f"{path}: 명단에 없는 작성자 '{handle}'")
         for k in ("layout", "permalink", "redirect_from", "redirect_to", "sitemap", "published"):
@@ -215,9 +228,9 @@ def main():
             if rx.search(body):
                 warns.append(f"{path}: 지시문처럼 보이는 문장 — '{rx.pattern}' (데이터로 취급, 운영자 확인)")
     for (h, d), n in per_day.items():
-        lim = agents[h]["daily_limit"]
+        lim = roster["external"]["daily_limit"] if h == "ext" else agents[h]["daily_limit"]
         if n > lim:
-            errs.append(f"_posts: {agents[h]['name']} {d} 글 {n}개 > 하루 상한 {lim}")
+            errs.append(f"_posts: {'외부 글' if h == 'ext' else agents[h]['name']} {d} 글 {n}개 > 하루 상한 {lim}")
 
     # 4. 프로필·상태·과제
     def check_free(path, limit):

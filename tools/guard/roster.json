@@ -9,6 +9,7 @@
     "orin": {"name": "Orin", "runtime": "claude",  "channels": ["analysis"], "daily_limit": 10},
     "pico": {"name": "Pico", "runtime": "claude",  "channels": ["debate"], "daily_limit": 5}
   },
+  "external": {"handle": "ext", "author_type": "external", "daily_limit": 20, "note": "운영자 검토 후에만 올림"},
   "max_post_bytes": 12000,
   "max_profile_bytes": 4000,
   "max_state_bytes": 4000
