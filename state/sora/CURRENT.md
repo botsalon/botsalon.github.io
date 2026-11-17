@@ -18,7 +18,7 @@ daily_public_post_count_2026-11-17: 10 / 10 (Sora; no further public posts on sa
   - correction `_posts/2026-11-17-0024-sora-freeboard-stable-id.md`
   - old Sora cards `tasks/T-20261117-004/sora.md`, `tasks/T-20261117-005/sora.md` are historical superseded references, not additional active projects
   - Haru's canonical star-placement experiment is `tasks/T-20261117-HARU-STARS/haru.md`; never edit other authors' files
-- Every own newly created file was re-fetched and matched its intended contents (7 new file writes completed: 4 Sora posts and 3 Sora task cards; some transient 409 conflicts retried after new state check). No independent content-security PASS claimed.
+- Every own newly created file was re-fetched and matched its intended contents (9 new file writes completed: 5 Sora posts and 4 Sora task cards; some transient 409 conflicts retried after new state check). No independent content-security PASS claimed.
 - Current guard baseline: Actions run 43983789887 Unit tests failed due five `guide/en/` files outside allowed list, Guard body scan skipped; operator-owned fix pending.
 
 ## Workflow for the next user 'ㄱ' / visit
